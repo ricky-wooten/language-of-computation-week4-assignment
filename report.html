@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingestion Report</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f6f4; --card: #ffffff; --text: #20201e; --muted: #62625d; --line: #d9d9d3;
+    --accent: #1f5f8b; --accent-text: #ffffff;
+    --good-bg: #e2f2e6; --good: #1c5f2e;
+    --warn-bg: #fbeed0; --warn: #6e4b00;
+    --bad-bg: #f9dfdc; --bad: #8c2118;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #191917; --card: #24241f; --text: #ecece6; --muted: #a9a9a0; --line: #3c3c35;
+      --accent: #7dbbe3; --accent-text: #10222e;
+      --good-bg: #17331f; --good: #9ad9a9;
+      --warn-bg: #3a2e12; --warn: #eccb82;
+      --bad-bg: #421c18; --bad: #f0aaa3;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { margin: 0 0 4px; font-size: 1.8rem; }
+  h2 { margin: 0; font-size: 1.2rem; overflow-wrap: anywhere; }
+  .intro, .meta { color: var(--muted); margin: 0; }
+  .intro { margin-bottom: 20px; }
+  .open-button { font: inherit; font-weight: 600; padding: 10px 18px; border: 0; border-radius: 8px;
+                 background: var(--accent); color: var(--accent-text); cursor: pointer; }
+  .open-button:hover { opacity: .9; }
+  .open-button:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  #status { margin: 14px 0 24px; }
+  #status.error { color: var(--bad); font-weight: 600; }
+  .run { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+         padding: 20px; margin-bottom: 20px; }
+  .verdict { display: inline-block; margin-bottom: 10px; padding: 4px 12px; border-radius: 999px; font-weight: 700; }
+  .verdict.good { background: var(--good-bg); color: var(--good); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .verdict.bad { background: var(--bad-bg); color: var(--bad); }
+  .numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 10px; margin: 16px 0 12px; }
+  .number { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+  .number strong { display: block; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+  .number span { color: var(--muted); font-size: .85rem; }
+  .totals { margin: 0 0 12px; color: var(--muted); }
+  .totals.bad { color: var(--bad); font-weight: 700; }
+  .error-box { margin: 12px 0; padding: 10px 12px; border-radius: 8px; background: var(--bad-bg);
+               color: var(--bad); overflow-wrap: anywhere; }
+  details { border-top: 1px solid var(--line); padding: 10px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  td { overflow-wrap: anywhere; min-width: 70px; }
+  td.number-cell { font-variant-numeric: tabular-nums; min-width: 0; }
+  .empty { margin: 8px 0 0; color: var(--muted); }
+  ul.cell-list { margin: 0; padding-left: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ingestion Report</h1>
+  <p class="intro">Choose <code>ingestion-log.json</code> from your assignment folder to see every run, newest first.</p>
+  <button class="open-button" id="open-button" type="button">Open ingestion-log.json</button>
+  <input id="file-input" type="file" accept=".json,application/json" hidden>
+  <p id="status" role="status" aria-live="polite">No log opened yet.</p>
+  <div id="runs"></div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var button = document.getElementById("open-button");
+  var input = document.getElementById("file-input");
+  var statusLine = document.getElementById("status");
+  var runsArea = document.getElementById("runs");
+
+  function make(tag, className, text) {
+    var element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined && text !== null) element.textContent = String(text);
+    return element;
+  }
+
+  function showStatus(message, isError) {
+    statusLine.textContent = message;
+    statusLine.className = isError ? "error" : "";
+  }
+
+  function countText(value) {
+    return typeof value === "number" ? value.toLocaleString() : "0";
+  }
+
+  function addNumber(parent, label, value) {
+    var box = make("div", "number");
+    box.appendChild(make("strong", "", countText(value)));
+    box.appendChild(make("span", "", label));
+    parent.appendChild(box);
+  }
+
+  function isbnText(row) {
+    var parts = [];
+    if (row.isbn) parts.push("isbn: " + row.isbn);
+    if (row.isbn13) parts.push("isbn13: " + row.isbn13);
+    return parts.length ? parts.join("\n") : "(both blank)";
+  }
+
+  function fillCell(cell, value) {
+    if (Array.isArray(value)) {
+      var list = make("ul", "cell-list");
+      value.forEach(function (item) { list.appendChild(make("li", "", item)); });
+      cell.appendChild(list);
+    } else {
+      cell.textContent = value === undefined || value === null ? "" : String(value);
+      cell.style.whiteSpace = "pre-line";
+    }
+  }
+
+  function buildTable(headings, rows, rowToCells) {
+    var wrap = make("div", "table-wrap");
+    var table = make("table");
+    var headerRow = make("tr");
+    headings.forEach(function (heading) {
+      var th = make("th", "", heading);
+      th.scope = "col";
+      headerRow.appendChild(th);
+    });
+    var head = make("thead");
+    head.appendChild(headerRow);
+    table.appendChild(head);
+    var body = make("tbody");
+    rows.forEach(function (row) {
+      var tr = make("tr");
+      rowToCells(row).forEach(function (value, index) {
+        var td = make("td", index === 1 && headings[1] === "Line" ? "number-cell" : "");
+        fillCell(td, value);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+    wrap.appendChild(table);
+    return wrap;
+  }
+
+  // Tables are built only when opened, so a long list doesn't slow the page.
+  function addSection(parent, title, rows, headings, rowToCells, startOpen) {
+    var section = make("details");
+    section.appendChild(make("summary", "", title + " (" + rows.length.toLocaleString() + ")"));
+    var built = false;
+    function build() {
+      if (built) return;
+      built = true;
+      if (!rows.length) {
+        section.appendChild(make("p", "empty", "None in this run."));
+      } else {
+        section.appendChild(buildTable(headings, rows, rowToCells));
+      }
+    }
+    section.addEventListener("toggle", function () { if (section.open) build(); });
+    if (startOpen && rows.length) { section.open = true; build(); }
+    parent.appendChild(section);
+  }
+
+  function verdictClass(verdict) {
+    if (verdict === "Everything loaded") return "good";
+    if (verdict === "The run failed") return "bad";
+    return "warn";
+  }
+
+  function listOf(value) { return Array.isArray(value) ? value : []; }
+
+  function renderRun(run, position, total) {
+    var card = make("article", "run");
+    var verdict = run.verdict || "Unknown result";
+    card.appendChild(make("div", "verdict " + verdictClass(verdict), verdict));
+    card.appendChild(make("h2", "", run.file || "(no file named)"));
+
+    var when = run.ran_at ? new Date(run.ran_at) : null;
+    var whenText = when && !isNaN(when.getTime()) ? when.toLocaleString() : (run.ran_at || "Unknown time");
+    card.appendChild(make("p", "meta", "Run " + (total - position) + " of " + total + " · " + whenText));
+
+    if (run.error) card.appendChild(make("div", "error-box", "Error: " + run.error));
+
+    var numbers = make("div", "numbers");
+    addNumber(numbers, "Rows read", run.rows_read);
+    addNumber(numbers, "Loaded", run.loaded);
+    addNumber(numbers, "Updated", run.updated);
+    addNumber(numbers, "Skipped", run.skipped);
+    addNumber(numbers, "Rejected", run.rejected);
+    addNumber(numbers, "Repairs", run.repair_count);
+    addNumber(numbers, "Warnings", run.warning_count);
+    card.appendChild(numbers);
+
+    if (run.totals_message) {
+      card.appendChild(make("p", "totals" + (run.totals_add_up === false ? " bad" : ""), run.totals_message));
+    }
+
+    addSection(card, "Rejected rows", listOf(run.rejected_rows),
+      ["File", "Line", "Title", "Value", "Reason", "What to do"],
+      function (row) {
+        var problems = listOf(row.problems);
+        var steps = [];
+        problems.forEach(function (problem) {
+          if (steps.indexOf(problem.what_to_do) === -1) steps.push(problem.what_to_do);
+        });
+        return [row.file, row.line, row.title, isbnText(row),
+                problems.map(function (problem) { return problem.reason; }), steps];
+      }, true);
+
+    addSection(card, "Skipped rows", listOf(run.skipped_rows),
+      ["File", "Line", "Title", "Value", "Reason"],
+      function (row) { return [row.file, row.line, row.title, isbnText(row), row.reason]; });
+
+    addSection(card, "Updates", listOf(run.updates),
+      ["File", "Line", "Title", "Changes"],
+      function (row) {
+        return [row.file, row.line, row.title, listOf(row.changes).map(function (change) {
+          return change.field + ": " + (change.old === "" ? "(blank)" : change.old) + " → " + change.new;
+        })];
+      });
+
+    addSection(card, "Warnings", listOf(run.warnings),
+      ["File", "Line", "Title", "Value", "Warning"],
+      function (row) { return [row.file, row.line, row.title, isbnText(row), row.warning]; });
+
+    var repairRows = Object.keys(run.repairs_by_type || {}).sort().map(function (name) {
+      return { name: name, count: run.repairs_by_type[name] };
+    });
+    addSection(card, "Repair types", repairRows, ["Type of repair", "Rows"],
+      function (row) { return [row.name, row.count.toLocaleString()]; });
+
+    return card;
+  }
+
+  function renderLog(runs, fileName) {
+    runsArea.textContent = "";
+    var newestFirst = runs.slice().reverse();
+    newestFirst.forEach(function (run, index) {
+      runsArea.appendChild(renderRun(run, index, newestFirst.length));
+    });
+    var word = runs.length === 1 ? "run" : "runs";
+    showStatus("Showing " + runs.length + " " + word + " from " + fileName + ", newest first.", false);
+  }
+
+  button.addEventListener("click", function () { input.click(); });
+
+  input.addEventListener("change", function () {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onerror = function () {
+      runsArea.textContent = "";
+      showStatus("That file could not be read.", true);
+    };
+    reader.onload = function () {
+      var runs;
+      try {
+        runs = JSON.parse(reader.result);
+      } catch (error) {
+        runsArea.textContent = "";
+        showStatus("That file is not valid JSON. Please choose ingestion-log.json.", true);
+        return;
+      }
+      if (!Array.isArray(runs)) {
+        runsArea.textContent = "";
+        showStatus("That file does not look like an ingestion log. Please choose ingestion-log.json.", true);
+        return;
+      }
+      renderLog(runs, file.name);
+    };
+    reader.readAsText(file);
+    input.value = "";
+  });
+})();
+</script>
+</body>
+</html>

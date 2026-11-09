@@ -1,0 +1,90 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: /Users/rickywooten/workspace/language-of-computation/week4-assignment
+collected 29 items
+
+test_ingest.py ...................FF........                             [100%]
+
+=================================== FAILURES ===================================
+________________ test_example_row_is_rejected[21-move-conflict] ________________
+
+workspace = <test_ingest.Workspace object at 0x108023850>
+isbn = '9780439139601', isbn13 = '9.7804391396e+12'
+sentence = 'Check which value or book is correct.'
+
+    @pytest.mark.parametrize("isbn, isbn13, sentence", REJECTED_EXAMPLES)
+    def test_example_row_is_rejected(workspace, isbn, isbn13, sentence):
+        path = workspace.write_csv("example.csv", [{"isbn": isbn, "isbn13": isbn13}])
+    
+        entry = workspace.run(path)
+    
+>       assert outcomes(entry) == {"loaded": 0, "updated": 0, "skipped": 0, "rejected": 1}
+E       AssertionError: assert {'loaded': 1,... 'updated': 0} == {'loaded': 0,... 'updated': 0}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'rejected': 0} != {'rejected': 1}
+E         {'loaded': 1} != {'loaded': 0}
+E         Use -v to get more diff
+
+test_ingest.py:250: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Everything loaded: /var/folders/p8/p4hl_jzn7zb15pxhj_ws8g0r0000gn/T/ingest-test-6eh2u52v/example.csv
+Rows read: 1
+Loaded:    1
+Updated:   0
+Skipped:   0
+Rejected:  0
+Repairs:   2
+Warnings:  0
+Rows read (1) = new books (1) + updated books (0) + unchanged duplicates (0) + rejected rows (0)
+Open report.html and choose ingestion-log.json to see the details.
+___ test_example_15_blank_and_blank_is_rejected_even_for_a_known_supplier_id ___
+
+workspace = <test_ingest.Workspace object at 0x1081a4af0>
+
+    def test_example_15_blank_and_blank_is_rejected_even_for_a_known_supplier_id(workspace):
+        known = {"isbn": "0439139600", "isbn13": "9780439139601", "book_id": "501",
+                 "title": "Known Book", "authors": "Known Author"}
+        first = workspace.write_csv("known.csv", [known])
+        workspace.run(first)
+        before = workspace.books()
+    
+        second = workspace.write_csv("blank.csv", [dict(known, isbn="", isbn13="")])
+        entry = workspace.run(second)
+    
+>       assert outcomes(entry) == {"loaded": 0, "updated": 0, "skipped": 0, "rejected": 1}
+E       AssertionError: assert {'loaded': 0,... 'updated': 1} == {'loaded': 0,... 'updated': 0}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'updated': 1} != {'updated': 0}
+E         {'rejected': 0} != {'rejected': 1}
+E         Use -v to get more diff
+
+test_ingest.py:271: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Everything loaded: /var/folders/p8/p4hl_jzn7zb15pxhj_ws8g0r0000gn/T/ingest-test-5k6gd4cq/known.csv
+Rows read: 1
+Loaded:    1
+Updated:   0
+Skipped:   0
+Rejected:  0
+Repairs:   0
+Warnings:  0
+Rows read (1) = new books (1) + updated books (0) + unchanged duplicates (0) + rejected rows (0)
+Open report.html and choose ingestion-log.json to see the details.
+Everything loaded: /var/folders/p8/p4hl_jzn7zb15pxhj_ws8g0r0000gn/T/ingest-test-5k6gd4cq/blank.csv
+Rows read: 1
+Loaded:    0
+Updated:   1
+Skipped:   0
+Rejected:  0
+Repairs:   0
+Warnings:  1
+Rows read (1) = new books (0) + updated books (1) + unchanged duplicates (0) + rejected rows (0)
+Open report.html and choose ingestion-log.json to see the details.
+=========================== short test summary info ============================
+FAILED test_ingest.py::test_example_row_is_rejected[21-move-conflict] - Asser...
+FAILED test_ingest.py::test_example_15_blank_and_blank_is_rejected_even_for_a_known_supplier_id
+========================= 2 failed, 27 passed in 2.52s =========================

@@ -1,23 +1,23 @@
 [
   {
-    "ran_at": "2026-11-09T13:06:53-06:00",
+    "ran_at": "2026-11-10T19:23:48-06:00",
     "file": "books.csv",
     "verdict": "Some rows need attention",
     "error": null,
     "rows_read": 10000,
-    "loaded": 9399,
+    "loaded": 9396,
     "updated": 0,
     "skipped": 0,
-    "rejected": 601,
+    "rejected": 604,
     "totals_add_up": true,
-    "totals_message": "Rows read (10000) = new books (9399) + updated books (0) + unchanged duplicates (0) + rejected rows (601)",
-    "repair_count": 15836,
+    "totals_message": "Rows read (10000) = new books (9396) + updated books (0) + unchanged duplicates (0) + rejected rows (604)",
+    "repair_count": 15835,
     "repairs_by_type": {
-      "Added leading zeros": 6579,
+      "Added leading zeros": 6578,
       "Rebuilt rounded isbn13 from isbn": 9238,
       "Calculated a missing ISBN value": 19
     },
-    "warning_count": 142,
+    "warning_count": 139,
     "rejected_rows": [
       {
         "file": "books.csv",
@@ -1503,6 +1503,19 @@
       },
       {
         "file": "books.csv",
+        "line": 2895,
+        "title": "Sailor Moon, #1 (Sailor Moon, #1)",
+        "isbn": "189221301X",
+        "isbn13": "6.45573003012e+11",
+        "problems": [
+          {
+            "reason": "Columns conflict: isbn '189221301X' and isbn13 '6.45573003012e+11' point to different numbers",
+            "what_to_do": "Check which value or book is correct."
+          }
+        ]
+      },
+      {
+        "file": "books.csv",
         "line": 2942,
         "title": "The Kiss of Deception (The Remnant Chronicles, #1)",
         "isbn": "",
@@ -1940,6 +1953,19 @@
           {
             "reason": "Both isbn and isbn13 are blank",
             "what_to_do": "Find the correct ISBN, correct the row, and load the file again."
+          }
+        ]
+      },
+      {
+        "file": "books.csv",
+        "line": 3690,
+        "title": "The Practice of the Presence of God",
+        "isbn": "883681056",
+        "isbn13": "6.30809681058e+11",
+        "problems": [
+          {
+            "reason": "Columns conflict: isbn '883681056' and isbn13 '6.30809681058e+11' point to different numbers",
+            "what_to_do": "Check which value or book is correct."
           }
         ]
       },
@@ -3162,6 +3188,19 @@
           {
             "reason": "Both isbn and isbn13 are blank",
             "what_to_do": "Find the correct ISBN, correct the row, and load the file again."
+          }
+        ]
+      },
+      {
+        "file": "books.csv",
+        "line": 5269,
+        "title": "Anatomy for the Artist",
+        "isbn": "078948045X",
+        "isbn13": "6.35517080452e+11",
+        "problems": [
+          {
+            "reason": "Columns conflict: isbn '078948045X' and isbn13 '6.35517080452e+11' point to different numbers",
+            "what_to_do": "Check which value or book is correct."
           }
         ]
       },
@@ -7974,14 +8013,6 @@
       },
       {
         "file": "books.csv",
-        "line": 2895,
-        "title": "Sailor Moon, #1 (Sailor Moon, #1)",
-        "isbn": "189221301X",
-        "isbn13": "6.45573003012e+11",
-        "warning": "isbn13 held a code that is not an ISBN (6.45573003012e+11), so it was left empty"
-      },
-      {
-        "file": "books.csv",
         "line": 3005,
         "title": "Crash (Crash, #1)",
         "isbn": "",
@@ -8075,14 +8106,6 @@
         "isbn": "",
         "isbn13": "9.78820319552e+12",
         "warning": "This row has no usable ISBN, so it adds no ISBN values"
-      },
-      {
-        "file": "books.csv",
-        "line": 3690,
-        "title": "The Practice of the Presence of God",
-        "isbn": "883681056",
-        "isbn13": "6.30809681058e+11",
-        "warning": "isbn13 held a code that is not an ISBN (6.30809681058e+11), so it was left empty"
       },
       {
         "file": "books.csv",
@@ -8243,14 +8266,6 @@
         "isbn": "",
         "isbn13": "9.78061540899e+12",
         "warning": "This row has no usable ISBN, so it adds no ISBN values"
-      },
-      {
-        "file": "books.csv",
-        "line": 5269,
-        "title": "Anatomy for the Artist",
-        "isbn": "078948045X",
-        "isbn13": "6.35517080452e+11",
-        "warning": "isbn13 held a code that is not an ISBN (6.35517080452e+11), so it was left empty"
       },
       {
         "file": "books.csv",
@@ -8975,24 +8990,24 @@
     ]
   },
   {
-    "ran_at": "2026-11-09T13:07:14-06:00",
+    "ran_at": "2026-11-10T19:23:55-06:00",
     "file": "books.csv",
     "verdict": "Some rows need attention",
     "error": null,
     "rows_read": 10000,
     "loaded": 0,
     "updated": 0,
-    "skipped": 9399,
-    "rejected": 601,
+    "skipped": 9396,
+    "rejected": 604,
     "totals_add_up": true,
-    "totals_message": "Rows read (10000) = new books (0) + updated books (0) + unchanged duplicates (9399) + rejected rows (601)",
-    "repair_count": 15836,
+    "totals_message": "Rows read (10000) = new books (0) + updated books (0) + unchanged duplicates (9396) + rejected rows (604)",
+    "repair_count": 15835,
     "repairs_by_type": {
-      "Added leading zeros": 6579,
+      "Added leading zeros": 6578,
       "Rebuilt rounded isbn13 from isbn": 9238,
       "Calculated a missing ISBN value": 19
     },
-    "warning_count": 142,
+    "warning_count": 139,
     "rejected_rows": [
       {
         "file": "books.csv",
@@ -10478,6 +10493,19 @@
       },
       {
         "file": "books.csv",
+        "line": 2895,
+        "title": "Sailor Moon, #1 (Sailor Moon, #1)",
+        "isbn": "189221301X",
+        "isbn13": "6.45573003012e+11",
+        "problems": [
+          {
+            "reason": "Columns conflict: isbn '189221301X' and isbn13 '6.45573003012e+11' point to different numbers",
+            "what_to_do": "Check which value or book is correct."
+          }
+        ]
+      },
+      {
+        "file": "books.csv",
         "line": 2942,
         "title": "The Kiss of Deception (The Remnant Chronicles, #1)",
         "isbn": "",
@@ -10915,6 +10943,19 @@
           {
             "reason": "Both isbn and isbn13 are blank",
             "what_to_do": "Find the correct ISBN, correct the row, and load the file again."
+          }
+        ]
+      },
+      {
+        "file": "books.csv",
+        "line": 3690,
+        "title": "The Practice of the Presence of God",
+        "isbn": "883681056",
+        "isbn13": "6.30809681058e+11",
+        "problems": [
+          {
+            "reason": "Columns conflict: isbn '883681056' and isbn13 '6.30809681058e+11' point to different numbers",
+            "what_to_do": "Check which value or book is correct."
           }
         ]
       },
@@ -12137,6 +12178,19 @@
           {
             "reason": "Both isbn and isbn13 are blank",
             "what_to_do": "Find the correct ISBN, correct the row, and load the file again."
+          }
+        ]
+      },
+      {
+        "file": "books.csv",
+        "line": 5269,
+        "title": "Anatomy for the Artist",
+        "isbn": "078948045X",
+        "isbn13": "6.35517080452e+11",
+        "problems": [
+          {
+            "reason": "Columns conflict: isbn '078948045X' and isbn13 '6.35517080452e+11' point to different numbers",
+            "what_to_do": "Check which value or book is correct."
           }
         ]
       },
@@ -39043,14 +39097,6 @@
       },
       {
         "file": "books.csv",
-        "line": 2895,
-        "title": "Sailor Moon, #1 (Sailor Moon, #1)",
-        "isbn": "189221301X",
-        "isbn13": "6.45573003012e+11",
-        "reason": "Already in the database, and nothing changed"
-      },
-      {
-        "file": "books.csv",
         "line": 2896,
         "title": "Think Like a Freak",
         "isbn": "62218360",
@@ -45127,14 +45173,6 @@
         "title": "The Cabinet of Curiosities (Pendergast, #3)",
         "isbn": "446611239",
         "isbn13": "9.78044661124e+12",
-        "reason": "Already in the database, and nothing changed"
-      },
-      {
-        "file": "books.csv",
-        "line": 3690,
-        "title": "The Practice of the Presence of God",
-        "isbn": "883681056",
-        "isbn13": "6.30809681058e+11",
         "reason": "Already in the database, and nothing changed"
       },
       {
@@ -57007,14 +57045,6 @@
         "title": "The Recruit (Cherub, #1)",
         "isbn": "068987779X",
         "isbn13": "9.7806898778e+12",
-        "reason": "Already in the database, and nothing changed"
-      },
-      {
-        "file": "books.csv",
-        "line": 5269,
-        "title": "Anatomy for the Artist",
-        "isbn": "078948045X",
-        "isbn13": "6.35517080452e+11",
         "reason": "Already in the database, and nothing changed"
       },
       {
@@ -92142,14 +92172,6 @@
       },
       {
         "file": "books.csv",
-        "line": 2895,
-        "title": "Sailor Moon, #1 (Sailor Moon, #1)",
-        "isbn": "189221301X",
-        "isbn13": "6.45573003012e+11",
-        "warning": "isbn13 held a code that is not an ISBN (6.45573003012e+11), so it was left empty"
-      },
-      {
-        "file": "books.csv",
         "line": 3005,
         "title": "Crash (Crash, #1)",
         "isbn": "",
@@ -92243,14 +92265,6 @@
         "isbn": "",
         "isbn13": "9.78820319552e+12",
         "warning": "This row has no usable ISBN, so it adds no ISBN values"
-      },
-      {
-        "file": "books.csv",
-        "line": 3690,
-        "title": "The Practice of the Presence of God",
-        "isbn": "883681056",
-        "isbn13": "6.30809681058e+11",
-        "warning": "isbn13 held a code that is not an ISBN (6.30809681058e+11), so it was left empty"
       },
       {
         "file": "books.csv",
@@ -92411,14 +92425,6 @@
         "isbn": "",
         "isbn13": "9.78061540899e+12",
         "warning": "This row has no usable ISBN, so it adds no ISBN values"
-      },
-      {
-        "file": "books.csv",
-        "line": 5269,
-        "title": "Anatomy for the Artist",
-        "isbn": "078948045X",
-        "isbn13": "6.35517080452e+11",
-        "warning": "isbn13 held a code that is not an ISBN (6.35517080452e+11), so it was left empty"
       },
       {
         "file": "books.csv",
@@ -93143,7 +93149,7 @@
     ]
   },
   {
-    "ran_at": "2026-11-09T13:07:35-06:00",
+    "ran_at": "2026-11-10T19:24:04-06:00",
     "file": "books-batch2.csv",
     "verdict": "Some rows need attention",
     "error": null,

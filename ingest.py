@@ -147,7 +147,13 @@ def read_isbn13(raw):
             return {"kind": "valid", "value": cleaned,
                     "repairs": [REPAIR_FORMAT] if cleaned != raw else []}
         return {"kind": "problem", "reason": "isbn13 has a wrong check digit"}
-    if SCIENTIFIC_NUMBER.match(cleaned) or DECIMAL_NUMBER.match(cleaned):
+    if SCIENTIFIC_NUMBER.match(cleaned):
+        # rules.md: scientific notation in isbn13 always uses its special rule.
+        # It is confirmed against the ISBN-13 derived from a valid isbn, and the
+        # row is rejected if they do not agree. Agreed with partners in Part 5:
+        # a scientific value that is not an ISBN is not "another kind of code".
+        return {"kind": "rounded", "number": Decimal(cleaned)}
+    if DECIMAL_NUMBER.match(cleaned):
         number = Decimal(cleaned)
         if number != number.to_integral_value():
             return {"kind": "other_code"}
